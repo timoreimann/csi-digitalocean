@@ -19,7 +19,7 @@ jobs:
           go-version: $GO_VERSION
 
       - name: Run unit tests
-        run: make test
+        run: make
 
   push-images:
     runs-on: ubuntu-18.04

@@ -3,8 +3,10 @@ name: test
 on:
   push:
     branches:
-      - master
+      - run-upstream-e2e-tests
   pull_request:
+    branches:
+      - run-upstream-e2e-tests
 
 jobs:
   unit-test:

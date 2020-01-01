@@ -18,6 +18,10 @@ RUNNER_IMAGE ?= $(CANONICAL_RUNNER_IMAGE)
 # Max Volumes to a Single Droplet is 7
 INTEGRATION_PARALLEL ?= 7
 
+ifneq ($(RUNNER_IMAGE_TAG_PREFIX),)
+	RUNNER_IMAGE_TAG_PREFIX := $(RUNNER_IMAGE_TAG_PREFIX)-
+endif
+
 all: check-unused test
 
 publish: compile build push clean

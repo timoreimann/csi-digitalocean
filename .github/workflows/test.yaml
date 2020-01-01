@@ -38,7 +38,7 @@ jobs:
       - name: build and push runner image
         env:
           RUNNER_IMAGE_TAG_PREFIX: ${{ github.head_ref }}
-        run: RUNNER_IMAGE=timoreimann/k8s-e2e-test-runner RUNNER_IMAGE_TAG_PREFIX=$(echo $RUNNER_IMAGE_TAG_PREFIX | cut -d/ -f3-) make runner-push
+        run: RUNNER_IMAGE=timoreimann/k8s-e2e-test-runner make runner-push
 
       - name: Build and push plugin image
         run: DOCKER_REPO=timoreimann/do-csi-plugin-dev VERSION=$(basename $GITHUB_REF) make compile build push
@@ -70,7 +70,6 @@ jobs:
           RUNNER_IMAGE_TAG_PREFIX: ${{ github.head_ref }}
         run: |
           BRANCH=$(basename $GITHUB_REF)
-          RUNNER_IMAGE_TAG_PREFIX=$(echo $RUNNER_IMAGE_TAG_PREFIX | cut -d/ -f3-)
           if [[ $RUNNER_IMAGE_TAG_PREFIX ]]; then
             RUNNER_IMAGE_TAG_PREFIX=${RUNNER_IMAGE_TAG_PREFIX}-
           fi

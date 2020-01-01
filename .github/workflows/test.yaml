@@ -2,6 +2,9 @@ name: test
 
 on: push
 
+env:
+  GO_VERSION: '1.13.5'
+
 jobs:
   unit-test:
     runs-on: ubuntu-18.04
@@ -13,7 +16,7 @@ jobs:
       - name: Go setup
         uses: actions/setup-go@v1
         with:
-          go-version: '1.13.5'
+          go-version: $GO_VERSION
 
       - name: Run unit tests
         run: make test
@@ -49,7 +52,7 @@ jobs:
       - name: Go setup
         uses: actions/setup-go@v1
         with:
-          go-version: '1.13.5'
+          go-version: $GO_VERSION
 
       - name: Install kustomize
         env:

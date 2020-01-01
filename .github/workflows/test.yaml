@@ -5,6 +5,7 @@ on: push
 env:
   GO_VERSION: '1.13.5'
 
+
 jobs:
   unit-test:
     runs-on: ubuntu-18.04
@@ -33,7 +34,9 @@ jobs:
         run: echo ${{ secrets.DockerHubToken }} | docker login --username timoreimann --password-stdin
 
       - name: build and push runner image
-        run: RUNNER_IMAGE=timoreimann/k8s-e2e-test-runner RUNNER_IMAGE_TAG_PREFIX=$(basename $GITHUB_REF) make runner-push
+        env:
+          RUNNER_IMAGE_TAG_PREFIX: ${{ github.head_ref }}
+        run: RUNNER_IMAGE=timoreimann/k8s-e2e-test-runner RUNNER_IMAGE_TAG_PREFIX=$(echo $RUNNER_IMAGE_TAG_PREFIX | cut -d/ -f3-) make runner-push
 
       - name: Build and push plugin image
         run: DOCKER_REPO=timoreimann/do-csi-plugin-dev VERSION=$(basename $GITHUB_REF) make compile build push
@@ -62,4 +65,11 @@ jobs:
       - name: Run end-to-end tests
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.CSIDigitalOceanAccessToken }}
-        run: TIMEOUT=60m make test-e2e E2E_ARGS="-driver-image timoreimann/do-csi-plugin-dev:$(basename $GITHUB_REF) -runner-image timoreimann/k8s-e2e-test-runner:$(basename $GITHUB_REF)-latest -name-suffix $(basename $GITHUB_REF) ${{ matrix.kube-release }}"
+          RUNNER_IMAGE_TAG_PREFIX: ${{ github.head_ref }}
+        run: |
+          BRANCH=$(basename $GITHUB_REF)
+          RUNNER_IMAGE_TAG_PREFIX=$(echo $RUNNER_IMAGE_TAG_PREFIX | cut -d/ -f3-)
+          if [[ $RUNNER_IMAGE_TAG_PREFIX ]]; then
+            RUNNER_IMAGE_TAG_PREFIX=${RUNNER_IMAGE_TAG_PREFIX}-
+          fi
+          TIMEOUT=60m make test-e2e E2E_ARGS="-driver-image timoreimann/do-csi-plugin-dev:${BRANCH} -runner-image timoreimann/k8s-e2e-test-runner:${RUNNER_IMAGE_TAG_PREFIX}latest -name-suffix ${BRANCH} ${{ matrix.kube-release }}"

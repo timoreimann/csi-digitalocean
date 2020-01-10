@@ -11,8 +11,8 @@ DriverInfo:
     exec: true
     snapshotDataSource: true
     multipods: true
-    controllerExpansion: true
-    nodeExpansion: true
+    controllerExpansion: false
+    nodeExpansion: false
     volumeLimits: true
     singleNodeVolume: true
   SupportedFsType:

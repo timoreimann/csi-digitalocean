@@ -40,7 +40,9 @@ jobs:
         run: RUNNER_IMAGE=timoreimann/k8s-e2e-test-runner make runner-push
 
       - name: Build and push plugin image
-        run: DOCKER_REPO=timoreimann/do-csi-plugin-dev VERSION=$(echo $GITHUB_REF | cut -d/ -f3-) make compile build push
+        run: |
+          echo "GITHUB_REF is: $GITHUB_REF"
+          DOCKER_REPO=timoreimann/do-csi-plugin-dev VERSION=$(echo $GITHUB_REF | cut -d/ -f3-) make compile build push
 
   e2e-test:
     runs-on: ubuntu-18.04

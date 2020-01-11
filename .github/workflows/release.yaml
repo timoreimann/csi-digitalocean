@@ -1,0 +1,38 @@
+### Release a new CSI version once a tag is pushed.
+name: release
+
+on:
+  push:
+    tags:
+      - v*
+      - '!v0.*'
+      - '!v1.0.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+
+      - name: Log into container registry
+        run: echo ${{ secrets.DockerHubToken }} | docker login --username timoreimann --password-stdin
+
+      - name: tag new CSI plugin release image
+        env:
+          TAG: ${{ github.ref }}
+        run: |
+          docker pull timoreimann/do-csi-plugin:master
+          docker tag timoreimann/do-csi-plugin:master timoreimann/do-csi-plugin:${TAG}
+          docker push timoreimann/do-csi-plugin:${TAG}
+
+      - name: create Github release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: |
+            See the [change log](CHANGELOG.md) for details.

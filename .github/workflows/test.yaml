@@ -81,3 +81,21 @@ jobs:
             TAG=latest
           fi
           TIMEOUT=60m make test-e2e E2E_ARGS="-ginkgo-nodes 3 -driver-image timoreimann/do-csi-plugin-dev:${TAG} -runner-image timoreimann/k8s-e2e-test-runner:${RUNNER_IMAGE_TAG_PREFIX}latest -name-suffix ${NAME_SUFFIX} ${{ matrix.kube-release }}"
+
+  tag-new-master-image:
+    runs-on: ubuntu-18.04
+    if: github.ref == 'refs/heads/master'
+    needs: e2e-test
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+
+      - name: Log into container registry
+        run: echo ${{ secrets.DockerHubToken }} | docker login --username timoreimann --password-stdin
+
+      - name: tag new CSI plugin master image
+        run: |
+          docker pull timoreimann/do-csi-plugin-dev:latest
+          docker tag timoreimann/do-csi-plugin-dev:latest timoreimann/do-csi-plugin:master
+          docker push timoreimann/do-csi-plugin:master

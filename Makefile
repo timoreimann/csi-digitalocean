@@ -83,6 +83,26 @@ endif
 	@docker push $(DOCKER_REPO):$(VERSION)
 	@echo "==> Your image is now available at $(DOCKER_REPO):$(VERSION)"
 
+# runner-build builds the e2e test runner image. Sadly, this is much harder to
+# do cache-efficiently than it should be for Docker multi-stage builds since
+# those require build targets to be pushed and referenced individually. See
+# https://andrewlock.net/caching-docker-layers-on-serverless-build-hosts-with-multi-stage-builds---target,-and---cache-from/
+# for more context.
+#
+# The Makefile target implementation does a lot of pulling and employs
+# --cache-from heavily to ensure building the image works as fast as possible.
+# In particular, building the layers that compile the individual Kubernetes
+# releases can take a fairly long time otherwise.
+#
+# The build uses the following, customizable variables:
+#
+# - RUNNER_IMAGE: Overwrite the runner image to be build and pushed.
+# - RUNNER_IMAGE_TAG_PREFIX: A prefix before the tag. This is to allow building
+#       images specific to PRs during CI, using the remote branch name as the
+#       prefix. For master builds during CI, the prefix will be left empty.
+#
+# CANONICAL_RUNNER_IMAGE is not overwriteable; it references the canonical
+# runner image name as a cache source only.
 .PHONY: runner-build
 runner-build:
 	@echo "pulling cache images"

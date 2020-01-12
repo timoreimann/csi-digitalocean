@@ -75,7 +75,14 @@ jobs:
       - name: Run end-to-end tests
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.CSIDigitalOceanAccessToken }}
+          # ${{ github.head_ref }} will be empty for pull requests and non-empty
+          # for pushes. Handle the cases in "run" below to parameterize our e2e
+          # test invocation accordingly.
           BRANCH: ${{ github.head_ref }}
+          # Use less ginkgo nodes to avoid running into the DO API rate limit.
+          # The upstream end-to-end tests are quite demanding in terms of API
+          # request volume.
+          NUM_GINKGO_NODES: "3"
         run: |
           NAME_SUFFIX="${BRANCH}"
           TAG="${BRANCH}"
@@ -85,7 +92,7 @@ jobs:
             NAME_SUFFIX=master
             TAG=latest
           fi
-          TIMEOUT=60m make test-e2e E2E_ARGS="-ginkgo-nodes 3 -driver-image timoreimann/do-csi-plugin-dev:${TAG} -runner-image timoreimann/k8s-e2e-test-runner:${RUNNER_IMAGE_TAG_PREFIX}latest -name-suffix ${NAME_SUFFIX} ${{ matrix.kube-release }}"
+          TIMEOUT=60m make test-e2e E2E_ARGS="-ginkgo-nodes ${NUM_GINKGO_NODES} -driver-image timoreimann/do-csi-plugin-dev:${TAG} -runner-image timoreimann/k8s-e2e-test-runner:${RUNNER_IMAGE_TAG_PREFIX}latest -name-suffix ${NAME_SUFFIX} ${{ matrix.kube-release }}"
 
   tag-new-master-image:
     runs-on: ubuntu-18.04

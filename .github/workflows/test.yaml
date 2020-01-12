@@ -1,3 +1,6 @@
+### Run unit as well as end-to-end tests on PRs and master pushes. For the
+### latter, we also push a new CSI plugin master image to the container
+### registry.
 name: test
 
 on:
@@ -36,6 +39,8 @@ jobs:
 
       - name: build and push runner image
         env:
+          # ${{ github.head_ref }} is empty for non-pull requests, which is
+          # exactly what we want on master.
           RUNNER_IMAGE_TAG_PREFIX: ${{ github.head_ref }}
         run: RUNNER_IMAGE=timoreimann/k8s-e2e-test-runner make runner-push
 

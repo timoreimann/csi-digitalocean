@@ -16,8 +16,8 @@
 name: release
 
 env:
-  DOCKER_ORG: digitalocean
-  DOCKER_USER: ${{ secrets.DockerHubUser }}
+  DOCKER_ORG: timoreimann
+  DOCKER_USER: timoreimann
 
 on:
   push:

@@ -24,7 +24,7 @@ env:
 on:
   push:
     branches:
-      - master
+      - master all
   pull_request:
     branches:
 

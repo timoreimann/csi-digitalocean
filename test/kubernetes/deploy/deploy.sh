@@ -51,6 +51,12 @@ if [[ -z "${YES}" ]]; then
     fi
 fi
 
+if [[ "${KUBECONFIG}" ]]; then
+    echo '$KUBECONFIG is non-empty.'
+else
+    echo '$KUBECONFIG IS empty.'
+fi
+
 # Create a secret containing the specified DO API token; this will be used by
 # the dev version of the CSI controller.
 # Piping the dry-run YAML output to kubectl apply is a common trick to implement
